@@ -1,4 +1,4 @@
-This version is running with [dotnet](https://www.microsoft.com/net) >= 2.0
+This version is running with [dotnet](https://www.microsoft.com/net) >= 2.2
 
 The test script is changed to not contain illegal input, however the
 test reference file is not changed. So once you get the test running it
