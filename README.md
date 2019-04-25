@@ -20,3 +20,7 @@ dotnet restore
 ```
 dotnet test
 ```
+
+## FeedBack
+
+* Should have distinct players ?

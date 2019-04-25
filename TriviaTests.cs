@@ -5,14 +5,11 @@ using Xunit;
 using Assent;
 using Assent.Reporters;
 using Assent.Reporters.DiffPrograms;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace Trivia
 {
-    public class TriviaTests
+    public partial class TriviaTests
     {
         [Fact]
         public void RefactoringTests()
@@ -65,64 +62,58 @@ namespace Trivia
             this.Assent(output.ToString(), configuration);
         }
 
-        class BetterPlayer
-        {
-            public BetterPlayer(string name)
-            {
-                Name = name;
-            }
+        const string ValidPlayerName = "Player";
 
-            public string Name { get; }
+        [Fact]
+        public void PleayerSet_should_have_at_least_two_users()
+        {
+            Assert.Throws<NotEnoughPlayerException>(() => new BetterPlayerSet(null, null, new BetterPlayer(ValidPlayerName)));
         }
 
-        class BetterGame
+        [Fact]
+        public void Should_be_able_to_create_a_PleayerSet_with_two_users()
         {
-            readonly List<BetterPlayer> players;
-            public BetterGame(BetterPlayer player1, BetterPlayer player2, BetterPlayer player3 = null, BetterPlayer player4 = null, BetterPlayer player5 = null, BetterPlayer player6 = null)
-            {
-                this.players =
-                    new List<BetterPlayer>(new[] { player1, player2, player3, player4, player5, player6 })
-                        .Where(p => p != null)
-                        .ToList();
-            }
+            new BetterPlayerSet(new BetterPlayer(ValidPlayerName), null, null, null, null, new BetterPlayer(ValidPlayerName));
         }
 
-        class NotEnoughPlayerException : Exception
+        [Fact]
+        public void Game_Should_throw_when_provided_with_null_PlayerSet()
         {
-            public NotEnoughPlayerException()
-            {
-            }
+            Assert.Throws<ArgumentNullException>(() => new BetterGame(null)); 
+        }
 
-            public NotEnoughPlayerException(string message) : base(message)
+        [Fact]
+        public void Default_Dice_roll_should_return_a_value_from_one_to_six()
+        {
+            var dice = new DefaultDice();
+            foreach(var roll in Enumerable.Range(0, 100).Select(_=>dice.Roll()))
             {
-            }
-
-            public NotEnoughPlayerException(string message, Exception innerException) : base(message, innerException)
-            {
-            }
-
-            protected NotEnoughPlayerException(SerializationInfo info, StreamingContext context) : base(info, context)
-            {
+                Assert.InRange(roll, 1, 6);
             }
         }
 
         [Fact]
-        public void AddUser()
+        public void Player_should_have_a_name()
         {
-            // var output = new StringBuilder();
-            // Console.SetOut(new StringWriter(output));
-
-            // Game aGame = new Game();
-            // Console.WriteLine(aGame.IsPlayable());
-            // aGame.Add("Chet");
-
-            // var configuration = BuildConfiguration();
-            // this.Assent(output.ToString(), configuration);
-
-            //
-
-            Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(null, null));
+            Assert.Throws<NotAValidPlayerNameException>(() => new BetterPlayer(""));
+            Assert.Throws<NotAValidPlayerNameException>(() => new BetterPlayer(" "));
+            Assert.Throws<NotAValidPlayerNameException>(() => new BetterPlayer(null));
         }
+
+        // Does not even compile when provided with more than 6 players
+        // [Fact]
+        // public void Game_should_have_at_most_six_users()
+        // {
+        //     Assert.Throws<NotEnoughPlayerException>(() => 
+        //         new BetterGame(
+        //             new BetterPlayer(""),
+        //             new BetterPlayer(""),
+        //             new BetterPlayer(""),
+        //             new BetterPlayer(""),
+        //             new BetterPlayer(""),
+        //             new BetterPlayer(""),
+        //             new BetterPlayer("")));
+        // }
 
         private static Configuration BuildConfiguration()
         {
