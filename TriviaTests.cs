@@ -65,6 +65,28 @@ namespace Trivia
             this.Assent(output.ToString(), configuration);
         }
 
+        [Fact]
+        public void GetOldConsoleOutput()
+        {
+            //Arrange
+
+            // Old game colnsole output
+            var oldGameOutput = new StringBuilder();
+            Console.SetOut(new StringWriter(oldGameOutput));
+            Game aGame = new Game();
+            Console.WriteLine(aGame.IsPlayable());
+            aGame.Add("Chet");
+            aGame.Add("Pat");
+            aGame.Add("Sue");
+            var oldGameConsoleStr = oldGameOutput.ToString();
+
+            // New game console output
+            var newGame = new BetterGame(new BetterPlayer("Chet"), new BetterPlayer("Pat"), new BetterPlayer("Sue"));
+            var histo = newGame.GetFlatGameHistory();
+
+            Assert.Equal(oldGameConsoleStr, histo);
+        }
+
         class BetterPlayer
         {
             public BetterPlayer(string name)
@@ -77,16 +99,38 @@ namespace Trivia
 
         class BetterGame
         {
+            private List<string> gameHistory;
+
             readonly List<BetterPlayer> players;
             public BetterGame(BetterPlayer player1, BetterPlayer player2, BetterPlayer player3 = null, BetterPlayer player4 = null, BetterPlayer player5 = null, BetterPlayer player6 = null)
             {
+                this.gameHistory = new List<string>();
+
+                this.AddHistoryEntry("False");
+
                 this.players =
                     new List<BetterPlayer>(new[] { player1, player2, player3, player4, player5, player6 })
                         .Where(p => p != null)
                         .ToList();
 
-              if(this.players.Count() < 2)
+                if (this.players.Count() < 2)
                     throw new NotEnoughPlayerException("You must specify at least two players !");
+
+                for (var i = 0; i < this.players.Count; i++)
+                {
+                    var player = players[i];
+                    this.AddHistoryEntry(player.Name + " was Added");
+                    this.AddHistoryEntry("They are player number " + (i + 1));
+                }
+            }
+
+            private void AddHistoryEntry(string action) => this.gameHistory.Add(action);
+            public string[] GetGameHistory() => this.gameHistory.ToArray();
+            public string GetFlatGameHistory() => string.Join("\r\n", GetGameHistory()) + "\r\n";
+
+            public void Roll(int roll)
+            {
+
             }
         }
 
@@ -110,12 +154,12 @@ namespace Trivia
         }
         [Fact]
         public void Should_Not_Throw_Exception_If_At_Least_Two_Players()
-        { 
-           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"));
-           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
-           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
-           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
-           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+        {
+            new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"));
+            new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+            new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+            new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+            new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
         }
 
         [Fact]
@@ -123,7 +167,7 @@ namespace Trivia
         {
             Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(null, null));
             Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(new BetterPlayer("Player"), null));
-            Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(null,new BetterPlayer("Player")));
+            Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(null, new BetterPlayer("Player")));
         }
 
         private static Configuration BuildConfiguration()
