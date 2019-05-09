@@ -84,6 +84,9 @@ namespace Trivia
                     new List<BetterPlayer>(new[] { player1, player2, player3, player4, player5, player6 })
                         .Where(p => p != null)
                         .ToList();
+
+              if(this.players.Count() < 2)
+                    throw new NotEnoughPlayerException("You must specify at least two players !");
             }
         }
 
@@ -105,23 +108,22 @@ namespace Trivia
             {
             }
         }
+        [Fact]
+        public void Should_Not_Throw_Exception_If_At_Least_Two_Players()
+        { 
+           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"));
+           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+           new BetterGame(new BetterPlayer("Kéviiiin"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"), new BetterPlayer("Clément"));
+        }
 
         [Fact]
-        public void AddUser()
+        public void Should_Throw_Exception_If_Less_Than_Two_Players()
         {
-            // var output = new StringBuilder();
-            // Console.SetOut(new StringWriter(output));
-
-            // Game aGame = new Game();
-            // Console.WriteLine(aGame.IsPlayable());
-            // aGame.Add("Chet");
-
-            // var configuration = BuildConfiguration();
-            // this.Assent(output.ToString(), configuration);
-
-            //
-
             Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(null, null));
+            Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(new BetterPlayer("Player"), null));
+            Assert.Throws<NotEnoughPlayerException>(() => new BetterGame(null,new BetterPlayer("Player")));
         }
 
         private static Configuration BuildConfiguration()
