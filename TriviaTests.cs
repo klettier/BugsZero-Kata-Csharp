@@ -71,6 +71,33 @@ namespace Trivia
         }
 
         [Fact]
+        public void GetOldConsoleOutput()
+        {
+            //Arrange
+
+            // Old game colnsole output
+            var oldGameOutput = new StringBuilder();
+            Console.SetOut(new StringWriter(oldGameOutput));
+            Game aGame = new Game();
+            Console.WriteLine(aGame.IsPlayable());
+            aGame.Add("Chet");
+            aGame.Add("Pat");
+            aGame.Add("Sue");
+            var oldGameConsoleStr = oldGameOutput.ToString();
+
+            var logger = new Logger();
+            // New game console output
+            var newGame = new BetterPlayerSet(
+                new BetterPlayer("Chet"),
+                new BetterPlayer("Pat"),
+                new BetterPlayer("Sue"),
+                logger: logger);
+
+            var histo = logger.GetLog();
+            Assert.Equal(oldGameConsoleStr, histo);
+        }
+
+        [Fact]
         public void Should_be_able_to_create_a_PleayerSet_with_two_users()
         {
             new BetterPlayerSet(new BetterPlayer(ValidPlayerName), null, null, null, null, new BetterPlayer(ValidPlayerName));
