@@ -71,7 +71,7 @@ namespace Trivia
         }
 
         [Fact]
-        public void GetOldConsoleOutput()
+        public void GoldenMaster_Should_Init_Game_From_Players()
         {
             //Arrange
 
